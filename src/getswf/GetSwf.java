@@ -67,7 +67,18 @@ public final  static Logger log = Logger.getLogger("this_Class");
 	    }
 	
 	}
+	createEX();
 	log.info("finish");
+    
+    }
+    
+    private static  void createEX(){
+       File f = new File("./files/EX/");
+       if(!f.exists()){
+	    f.mkdirs();
+       }
+    
+    
     
     }
     
