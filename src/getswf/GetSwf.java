@@ -48,27 +48,23 @@ public class GetSwf {
 	}
 	log.info(url);
 	if (!url.isEmpty()) {
-	    counter(geturl(url));
+	    //counter(geturl(url));
+	     counter(url);
 	}
     }
 
-    private static void counter(String url) {
-	String sufix = ".swf";
-	String prefix = null;
-	if(url.contains("calameo")){
-	  prefix = "p";
-	}else if(url.contains("issuu")){
-	   prefix = "page_";
-	}
+    private static void counter(String ur) {
+	DynamicURL du = new DynamicURL(ur);
+	
 	
 	
 	int i = 0;
 	while (true) {
-	    String fileName = prefix + (++i) + sufix;
+	    String fileName = du.getPrefix() + (++i) + du.getSufix();
 	    GetSwf gs = new GetSwf();
 
 	    try {
-		URL u = new URL(url + fileName);
+		URL u = new URL(du.getAddressService() + fileName);
 		gs.fileWrite(new File("./files/" + fileName), gs.getData(u));
 		
 		log.log(Level.INFO, "operation with url : {0}  - is successful", u.toString());
@@ -93,12 +89,12 @@ public class GetSwf {
 
     }
 
-    private static String geturl(String url) {
-	String s[] = url.split("/");
-	url = url.replace(s[s.length - 1], "");
-	System.out.println(url);
-	return url;
-    }
+//    private static String geturl(String url) {
+//	String s[] = url.split("/");
+//	url = url.replace(s[s.length - 1], "");
+//	System.out.println(url);
+//	return url;
+//    }
 
     private ReadableByteChannel getData(URL url) throws Exception {
 	ReadableByteChannel channel = null;
