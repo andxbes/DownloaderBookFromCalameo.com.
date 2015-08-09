@@ -10,6 +10,11 @@ def mainClass='getswf.GetSwf'
 
 mainClassName=mainClass
 
+jar{
+    manifest{
+       attributes 'Main-Class': mainClass
+    }
+}
 
 repositories{
 	mavenCentral()
@@ -18,3 +23,12 @@ repositories{
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
 }
+
+task copyLib(type: Copy){
+    from'./lib/'
+    include'*.exe'
+    into'./build/libs/lib/'
+    
+}
+
+build.dependsOn copyLib

@@ -5,6 +5,7 @@
  */
 package getswf;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,6 +17,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -27,13 +34,18 @@ import javax.swing.JTextField;
  */
 public class GetSwf {
 
+	private static final ExecutorService task = Executors.newFixedThreadPool(3);
+	private static final List<Runnable> listOfTasks = Collections.synchronizedList(new LinkedList<>());
+
 	public final static Logger log = Logger.getLogger("this_Class");
+	private static String folderName;
 
 	/**
 	 * @param args
 	 *            the command line arguments 
 	 *            http://p2.calameo.com/140829102709-db0b671491bce0b62f8642f7beab1ae4/p1.swf
-	 *            http://page.issuu.com/130114195401-08397d4a891246c09a78233fd1304cc1/swf/page_9.swf
+	 *            http://page.issuu.com/130114195401-
+	 *            08397d4a891246c09a78233fd1304cc1/swf/page_9.swf
 	 */
 
 	public static void main(String[] args) {
@@ -47,15 +59,17 @@ public class GetSwf {
 		} else {
 			url = args[0];
 		}
-		log.info(url);
+		log.fine(url);
+
 		if (!url.isEmpty()) {
 			counter(url);
 		}
+		log.info("finish");
 	}
 
 	private static void counter(String ur) {
 		DynamicURL du = new DynamicURL(ur);
-
+		folderName = "./" + getGeneratedFolderName(du.getAddressService()) + "/";
 		int i = 0;
 		while (true) {
 			String fileName = du.getPrefix() + (++i) + du.getSufix();
@@ -63,29 +77,57 @@ public class GetSwf {
 
 			try {
 				URL u = new URL(du.getAddressService() + fileName);
-				gs.fileWrite(new File("./files/" + fileName), gs.getData(u));
+
+				gs.fileWrite(new File(folderName + fileName), gs.getData(u));
 
 				log.log(Level.INFO, "operation with url : {0}  - is successful", u.toString());
 			} catch (MalformedURLException ex) {
 				Logger.getLogger(GetSwf.class.getName()).log(Level.SEVERE, null, ex);
 			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(null, "Скачано " + (i - 1) + " файлa/(ов)", "Finish", 1);
 				break;
 			}
 
 		}
-		createEX();
-		log.info("finish");
 
+		runTasks();
+		endFunction();
+		JOptionPane.showMessageDialog(null, "Скачано " + (i - 1) + " файлa/(ов)", "Finish", 1);
 	}
 
-	private static void createEX() {
-		File f = new File("./files/EX/");
-		if (!f.exists()) {
-			f.mkdirs();
+	private static void endFunction() {
+		task.shutdown();
+		while (!task.isTerminated()) {
+			log.log(Level.INFO, "task  = {0}", listOfTasks.size());
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException ex) {
+				Logger.getLogger(GetSwf.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
+
+		Desktop desktop = null;
+		if (Desktop.isDesktopSupported()) {
+			desktop = Desktop.getDesktop();
+		}
+		try {
+
+			File openDir = new File(folderName + "results/");
+			if (!openDir.exists()) {
+				openDir = new File(openDir.getParent());
+			}
+			desktop.open(openDir);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+	}
+
+	private static void runTasks() {
+		for (Runnable listofTask : listOfTasks) {
+			task.submit(listofTask);
 		}
 
 	}
+
 
 	private ReadableByteChannel getData(URL url) throws Exception {
 		ReadableByteChannel channel = null;
@@ -106,7 +148,7 @@ public class GetSwf {
 		}
 		return channel;
 	}
-
+	
 	private void fileWrite(File f, ReadableByteChannel rbc) {
 
 		if (!f.exists()) {
@@ -129,6 +171,12 @@ public class GetSwf {
 				if (rbc != null) {
 					try {
 						rbc.close();
+						// extract files
+						if (f.getName().toString().contains(".swf"))
+							listOfTasks.add(() -> {
+								new ExtractSwf(f).extract();
+								listOfTasks.remove(this);
+							});
 					} catch (IOException ex) {
 						Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
 					}
@@ -137,6 +185,10 @@ public class GetSwf {
 			}
 		}
 
+	}
+	
+	static String getGeneratedFolderName(String s) {
+		return s.replaceAll("http://", "").replaceAll("/", "=").replaceAll("\\.", "-");
 	}
 
 }
