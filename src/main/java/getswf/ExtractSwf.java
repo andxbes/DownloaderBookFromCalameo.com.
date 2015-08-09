@@ -8,12 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
-
-import javax.sound.midi.Soundbank;
-
-import sun.util.logging.resources.logging;
 
 public class ExtractSwf {
 	private final File file;
@@ -78,7 +73,7 @@ public class ExtractSwf {
 			for (String id : ids) {
 				try {
 					log.info("copy to " + resultFolder.getAbsolutePath()+ "/" + id + fileName);
-					Process p = Runtime.getRuntime().exec(app.getAbsolutePath() 
+					Runtime.getRuntime().exec(app.getAbsolutePath() 
 							+ " " + key + " " + id 
 							+ " -o " + resultFolder.getAbsolutePath() + "/" + "("+ id + ")" + fileName + sufix 
 							+ " " + file.getAbsolutePath());

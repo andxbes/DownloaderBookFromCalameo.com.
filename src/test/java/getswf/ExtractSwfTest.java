@@ -23,10 +23,10 @@ public class ExtractSwfTest {
 		System.out.println(new File(".").getAbsolutePath());
 		
 		
-		ExtractSwf es = new ExtractSwf(new File(getClass().getResource("/p1.swf").getFile()));
+		ExtractSwf es = new ExtractSwf(new File(getClass().getResource("/swf/p1.swf").getFile()));
 		es.extract();
 		
-		ExtractSwf es2 = new ExtractSwf(new File(getClass().getResource("/page_1.swf").getFile()));
+		ExtractSwf es2 = new ExtractSwf(new File(getClass().getResource("/swf/p2.swf").getFile()));
 		es2.extract();
 	}
 	
