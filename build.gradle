@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: "application"
+apply plugin: 'eclipse'
 
 sourceCompatibility='1.8'
 
@@ -34,3 +35,15 @@ task copyLib(type: Copy){
 }
 
 build.dependsOn copyLib
+
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',  
+        	'Main-Class': mainClass
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+build.dependsOn fatJar

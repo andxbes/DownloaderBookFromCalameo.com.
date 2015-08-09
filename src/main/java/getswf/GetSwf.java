@@ -105,16 +105,25 @@ public class GetSwf {
 			}
 		}
 
+		File openDir = new File(folderName + "results/");
+		if (!openDir.exists()) {
+			openDir = new File(openDir.getParent());
+		}
+		new PdfConverter(openDir).convert();
+		
+		openFolder(openDir);
+		
+		File pdf = new File(folderName + "pdf/");
+		if(pdf.exists())openFolder(pdf);
+	}
+
+	private static void openFolder(File openDir) {
 		Desktop desktop = null;
 		if (Desktop.isDesktopSupported()) {
 			desktop = Desktop.getDesktop();
 		}
+		
 		try {
-
-			File openDir = new File(folderName + "results/");
-			if (!openDir.exists()) {
-				openDir = new File(openDir.getParent());
-			}
 			desktop.open(openDir);
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -127,7 +136,6 @@ public class GetSwf {
 		}
 
 	}
-
 
 	private ReadableByteChannel getData(URL url) throws Exception {
 		ReadableByteChannel channel = null;
@@ -148,7 +156,7 @@ public class GetSwf {
 		}
 		return channel;
 	}
-	
+
 	private void fileWrite(File f, ReadableByteChannel rbc) {
 
 		if (!f.exists()) {
@@ -186,7 +194,7 @@ public class GetSwf {
 		}
 
 	}
-	
+
 	static String getGeneratedFolderName(String s) {
 		return s.replaceAll("http://", "").replaceAll("/", "=").replaceAll("\\.", "-");
 	}
