@@ -31,9 +31,7 @@ private Document doc ;
 			folderForPdf.mkdirs();
 			folderForPdf.setWritable(true);
 		}
-		
-		log.info(folderForPdf.toString());
-		
+	
 		doc = new Document();
 		
 	}
@@ -48,8 +46,8 @@ private Document doc ;
 		if(files.length < 1){
 			return;
 		}
-		System.out.println(folderForPdf);
-		System.out.println(folderForPdf.isDirectory());
+		log.info(folderForPdf.toString()+" , is directory : " + folderForPdf.isDirectory() );
+		
 		
 		try {
 			Image controllim = Image.getInstance(files[0].getAbsolutePath());
@@ -60,13 +58,14 @@ private Document doc ;
 			writer = PdfWriter.getInstance(doc, fos);
 			writer.open();
 			doc.open();
-		    System.out.println(doc.getPageSize());
+		  
 			for (File file : files) {
-				System.out.println(file.getName());
+				
 				Image im = Image.getInstance(file.getAbsolutePath());
 				doc.add(im);
 			}
-			System.out.println(doc.getPageSize());
+			log.config(doc.getPageSize().toString());
+			log.fine("created :\n" + Arrays.asList(folderForPdf.listFiles()).toString());
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

@@ -13,29 +13,35 @@ import java.util.logging.Logger;
 public class ExtractSwf {
 	private final File file;
 	private static Logger log = Logger.getLogger("ExtractSwf");
-	private File app = new File("./lib/swfextract.exe");
+	private static  File app = new File("./lib/swfextract.exe");
+	
+	static{
+		log.config("contents of a folder ./lib/:\n"
+				+ Arrays.asList(app.getParentFile().listFiles()).toString());
+	}
 
 	public ExtractSwf(File f) {
 		this.file = f;
+		
 		// extract();
 	}
 
 	void extract() {
 		String name = file.getAbsolutePath();
 		try {
-			log.fine("Извлекаем");
+			
 
 			Map<String, List<String>> map = new HashMap<>(4);
-
-			Process p = Runtime.getRuntime().exec(app.getAbsolutePath() + " " + name);
+            String query = app.getAbsolutePath() + " " + name;
+            		log.fine(" get ids from swf  = " + query);
+			Process p = Runtime.getRuntime().exec(query);
 			BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 
 			while ((line = b.readLine()) != null) {
-				log.fine(line);
 				getKeyandIDs(line, map);
-
 			}
+			log.fine(" map with key + ids : \n"+map.toString());
 			copyFileToFolder(map);
 
 		} catch (IOException e) {
@@ -47,7 +53,7 @@ public class ExtractSwf {
 	void copyFileToFolder(Map<String, List<String>> map) {
 		
 		String fileName = file.getName().split("\\.")[0];
-		log.fine(fileName);
+		//log.fine(fileName);
 		File resultFolder = new File(file.getParentFile()
 				//.getParentFile()
 				.getAbsolutePath() + "/results");
@@ -72,11 +78,14 @@ public class ExtractSwf {
 			}
 			for (String id : ids) {
 				try {
-					log.info("copy to " + resultFolder.getAbsolutePath()+ "/" + id + fileName);
-					Runtime.getRuntime().exec(app.getAbsolutePath() 
+					File toFile = new File(resultFolder.getAbsolutePath() + "/" + "("+ id + ")" + fileName + sufix);
+					log.info("copy to " + toFile.toString());
+					String query = app.getAbsolutePath() 
 							+ " " + key + " " + id 
-							+ " -o " + resultFolder.getAbsolutePath() + "/" + "("+ id + ")" + fileName + sufix 
-							+ " " + file.getAbsolutePath());
+							+ " -o " + toFile.getAbsolutePath() 
+							+ " " + file.getAbsolutePath();
+					Runtime.getRuntime().exec(query);
+					log.config("query = " + query);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -94,7 +103,6 @@ public class ExtractSwf {
 			String stepNOne[] = s.split("[\\[\\]]");
 			String key = stepNOne[1];
 
-			log.fine("key : " + key);
 			String stepNtwo[] = stepNOne[stepNOne.length - 1].split(" ");
 
 			StringBuilder sb = new StringBuilder(5);
