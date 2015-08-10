@@ -25,7 +25,7 @@ private Rectangle pageSize;
 private Document doc ;
 	public PdfConverter(File f) {
 		folderForPictures = f;
-		folderForPdf= new File(f.getParentFile() + "/pdf/");
+		folderForPdf = new File(f.getParentFile() + "/pdf/");
 		fileName = new File(folderForPdf.getPath()+"/book.pdf");
 		if(!folderForPdf.exists()){
 			folderForPdf.mkdirs();
@@ -40,7 +40,7 @@ private Document doc ;
 		FileOutputStream fos = null;
 		PdfWriter writer = null;
 		File[] files = folderForPictures.listFiles();
-		
+		   
 		sortFiles(files);
 		
 		if(files.length < 1){

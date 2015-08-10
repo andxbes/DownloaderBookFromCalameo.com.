@@ -23,7 +23,7 @@ public class IO {
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 
-			if (conn.getResponseCode() == 200) {
+			if (conn.getResponseCode() == 200 || conn.getResponseCode() == 304 ) {
 				channel = Channels.newChannel(conn.getInputStream());
 			} else {
 				throw new Exception();

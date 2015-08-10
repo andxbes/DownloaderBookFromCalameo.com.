@@ -5,9 +5,7 @@
  */
 package getswf;
 
-import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -86,24 +84,13 @@ public class GetSwf {
 		}
 		new PdfConverter(openDir).convert();
 		
-		openFolder(openDir);
+		Start.openFolder(openDir);
 		
 		File pdf = new File(folderName + "pdf/");
-		if(pdf.exists())openFolder(pdf);
+		if(pdf.exists())Start.openFolder(pdf);
 	}
 
-	private  void openFolder(File openDir) {
-		Desktop desktop = null;
-		if (Desktop.isDesktopSupported()) {
-			desktop = Desktop.getDesktop();
-		}
-		
-		try {
-			desktop.open(openDir);
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-	}
+	
 
 	private  void runTasks() {
 		for (Runnable listofTask : listOfTasks) {
